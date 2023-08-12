@@ -85,6 +85,9 @@ options:
               - The name of the monitor.
               - Only required if no I(id) specified.
             type: str
+          sendUrl:
+            description: True if the monitor URL is a publicly shown clickable link.
+            type: bool
   incident:
     description: The incident of the status page.
     type: dict
@@ -187,6 +190,8 @@ def run(api, params, result):
             else:
                 monitor_name = monitor.pop("name")
                 monitor["id"] = get_monitor_by_name(api, monitor_name)["id"]
+            if monitor["sendUrl"] is None:
+                monitor.pop("sendUrl")
 
     try:
         status_page = api.get_status_page(slug)
@@ -240,7 +245,8 @@ def main():
             weight=dict(type="int", required=False),
             monitorList=dict(type="list", elements="dict", options=dict(
                 id=dict(type="int", required=False),
-                name=dict(type="str", required=False)
+                name=dict(type="str", required=False),
+                sendUrl=dict(type="bool", required=False)
             ))
         )),
         incident=dict(type="dict", options=dict(
